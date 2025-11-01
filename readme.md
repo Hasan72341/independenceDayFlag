@@ -1,16 +1,31 @@
-# Three.js Journey
+# Independence Day Flag
+
+A small Three.js demo that renders a waving Indian flag with 3D text.
 
 ## Setup
-Download [Node.js](https://nodejs.org/en/download/).
-Run this followed commands:
 
-``` bash
-# Install dependencies (only the first time)
+1. Install Node.js (https://nodejs.org/).
+
+2. Install dependencies (one-time):
+
+```bash
 npm install
+```
 
-# Run the local server at localhost:8080
+3. Run development server (Vite):
+
+```bash
 npm run dev
+```
 
-# Build for production in the dist/ directory
+4. Preview production build locally:
+
+```bash
+npm run preview
+```
+
+5. Build for production:
+
+```bash
 npm run build
 ```

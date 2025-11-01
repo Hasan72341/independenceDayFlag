@@ -17,6 +17,10 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Group to hold the flag and text
+const group = new THREE.Group()
+scene.add(group)
+
 /**
  * Fonts
  */
@@ -32,7 +36,7 @@ const flagTexture = textureLoader.load('/textures/Flag_of_India.png')
  * Test mesh
  */
 // Geometry
-const geometry = new THREE.PlaneGeometry(1,1, 32, 32)
+const geometry = new THREE.PlaneGeometry(1, 1, 32, 32)
 const count = geometry.attributes.position.count
 console.log('Vertex Count:', count) // Log the number of vertices
 const randoms = new Float32Array(count);
@@ -64,8 +68,8 @@ const material = new THREE.ShaderMaterial({
 const mesh = new THREE.Mesh(geometry, material)
 const scaleFlag = 7
 
-mesh.scale.y = scaleFlag * 2 / 3
-mesh.scale.x = scaleFlag * 1
+mesh.scale.y = (scaleFlag * 2) / 3
+mesh.scale.x = scaleFlag
 
 mesh.position.y += 5
 
@@ -88,38 +92,36 @@ fontLoader.load(
             bevelOffset: 0,
             bevelSegments: 5
         })
-        
+
         // Center the text
         textGeometry.center()
 
         // Text material
         const textMaterial = new THREE.MeshStandardMaterial({
-            // color: '#bf00ff',
-            map: textureLoader.load('/textures/Flag_of_India.png') // Saffron orange color for Independence Day
+            map: textureLoader.load('/textures/Flag_of_India.png')
         })
-        
+
         // Text mesh
         const text = new THREE.Mesh(textGeometry, textMaterial)
+        text.name = 'independenceText'
         text.position.y = 1.5 // Position above the flag
         group.add(text)
-        // Add rotation animation to text
-        const animateText = () => {
-            text.rotation.y = Math.sin(Date.now() * 0.001) * 0.1
+
+        // Store a simple animation function on the mesh for use in the render loop
+        text.userData.animate = (time) => {
+            text.rotation.y = Math.sin(time * 0.5) * 0.1
         }
-        
-        // Update the main animation loop to include text animation
-        const originalTick = tick
-        window.textAnimation = animateText
+    },
+    // onProgress - optional
+    undefined,
+    // onError
+    (err) => {
+        console.error('Failed to load font:', err)
     }
 )
 
-const group = new THREE.Group()
 group.add(mesh)
-
-scene.add(group)
-
 group.position.y -= 1
-
 group.scale.set(0.2, 0.2, 0.2)
 
 
@@ -129,16 +131,16 @@ scene.add(ambientLight)
 
 const countStars = 5000
 
-const startTexture = textureLoader.load('/textures/8.png')
+const starTexture = textureLoader.load('/textures/8.png')
 
 
 const pointMaterial = new THREE.PointsMaterial({
     color: '#ffffff',
     size: 0.05,
     sizeAttenuation: true,
-    map: startTexture,
+    map: starTexture,
     transparent: true,
-    alphaMap: startTexture
+    alphaMap: starTexture
 })
 
 
@@ -225,9 +227,10 @@ const tick = () =>
     // Update uniforms
     material.uniforms.uTime.value = elapsedTime
 
-    // Animate text if it exists
-    if (window.textAnimation) {
-        window.textAnimation()
+    // Animate text if it has an animation attached
+    const text = group.getObjectByName('independenceText')
+    if (text && typeof text.userData.animate === 'function') {
+        text.userData.animate(elapsedTime)
     }
 
     // Update controls
